@@ -1,55 +1,51 @@
-import logo from './logo.svg';
-import './App.css';
-import React, {useState, useEffect} from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import React, { useState, useEffect } from "react";
+import UserInfo from "./UserInfo";
 
 function App() {
   const [userList, setUserList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [resultsPerPage, setResultsPerPage] = useState(5);
-  const [totalResults, setTotalResults] = useState(50);
 
-  const lastIndex = currentPage * resultsPerPage;
-  const firstIndex = lastIndex - resultsPerPage;
-  const slice = userList.slice(firstIndex, lastIndex);
+  const RESULTS_PER_PAGE = 5;
+  const TOTAL_RESULTS = 50;
 
   const pagination = [];
 
-  for (let i = 1; i <= Math.ceil(totalResults / resultsPerPage); i++) {
-        pagination.push(i);
+  let lastIndex = currentPage * RESULTS_PER_PAGE;
+  let firstIndex = lastIndex - RESULTS_PER_PAGE;
+  let slice = userList.slice(firstIndex, lastIndex);
+
+  for (let i = 1; i <= Math.ceil(TOTAL_RESULTS / RESULTS_PER_PAGE); i++) {
+    pagination.push(i);
   }
 
   const fetchUserList = async () => {
-    const response = await fetch(`https://randomuser.me/api?results=${totalResults}`);
+    const response = await fetch(
+      `https://randomuser.me/api?results=${TOTAL_RESULTS}`
+    );
     const json = await response.json();
 
     setUserList(json.results);
-  };
-
-  const getUserInfo = (user, index) => {
-    return (
-      <li key={index}>
-        <p><img src={user.picture.large}></img></p>
-        <p>{user.name.first + " " + user.name.last}</p>
-      </li>
-    );
   };
 
   useEffect(() => {
     fetchUserList();
   }, []);
 
-
   return (
     <div className="App">
-      {slice.map((user, index) => getUserInfo(user, index))}
+      {slice.map((user, index) => (
+        <UserInfo user={user} index={index}></UserInfo>
+      ))}
 
       {pagination.map((i) => {
         return (
-            <button key={i} onClick={() => setCurrentPage(i)}>{i}</button>
-  
-        )
+          <button key={i} onClick={() => setCurrentPage(i)}>
+            {i}
+          </button>
+        );
       })}
-
     </div>
   );
 }
